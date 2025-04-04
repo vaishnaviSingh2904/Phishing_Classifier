@@ -10,13 +10,13 @@ function MainContainer() {
         <p className="text-gray-600 mb-8">With PhishSheild, you can scan suspicious URLs and Analyze Email Contain.</p>
         <div className="flex justify-center mb-8">
           <div className="border-b-2 border-gray-200">
-            <button onClick={() => setActiveTab('URL SCANNER')} className={`px-4 py-2 ${activeTab === 'URL SCANNER' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-600'}`}>URL SCANNER</button>
+            <button onClick={() => setActiveTab('URL SCANNER')} className={`px-4 py-2 ${activeTab === 'URL SCANNER' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-600'}`}>URL Scanner</button>
             <button onClick={() => setActiveTab('Email Content Analyzer')} className={`px-4 py-2 ${activeTab === 'Email Content Analyzer' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-600'}`}>Email Content Analyzer</button>
             <button onClick={() => setActiveTab('Classification')} className={`px-4 py-2 ${activeTab === 'Classification' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-600'}`}>Classification</button>
           </div>
         </div>
         <div className="flex justify-center mb-8">
-          <input type="text" placeholder="Scan a URL" className="border border-gray-300 rounded-l-full px-4 py-2 w-1/2" />
+          <input type="text" placeholder="Paste the URL" className="border border-gray-300 rounded-l-full px-4 py-2 w-1/2" />
           <button className="bg-blue-600 text-white px-6 py-2 rounded-r-full">Scan</button>
         </div>
         <div className="bg-blue-100 py-8">
