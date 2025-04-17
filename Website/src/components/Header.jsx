@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom'; // Fixed import for react-router-dom
-import image from '/headIcon.png'
 
 function Header() {
   return (
@@ -11,7 +10,7 @@ function Header() {
           <img
             src="/headIcon.png"
             alt="PhishShield logo"
-            className="h-20 scale-50"
+            className="h-20"
           />
           {/* <span className="ml-3 text-2xl font-bold text-blue-600">PhishShield</span> */}
         </div>
