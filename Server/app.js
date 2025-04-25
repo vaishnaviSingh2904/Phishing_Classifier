@@ -3,8 +3,10 @@ const cors = require('cors');
 const morgan = require('morgan');
 const apiRoutes = require('./routes/api'); 
 const bodyParser = require('body-parser');
-
 const app = express();
+const connectDB = require('./config/db')
+require('dotenv').config();
+
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -21,4 +23,5 @@ const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, ()=> {
     console.log(`Server is running on port ${PORT}`);
+    connectDB();
 });

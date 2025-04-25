@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const {register,login} = require('../controllers/authController')
 
 router.get('/health', (req,res) => {
     res.status(200).json(
@@ -25,5 +26,9 @@ router.post('/analyze-email', (req,res) => {
 
     res.status(200).json({message : 'Email analyzed successfully',headers: emailHeaders})
 });
+
+router.post('/register',register);
+router.post('/login',login);
+
 
 module.exports = router;
