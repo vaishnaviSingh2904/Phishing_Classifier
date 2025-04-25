@@ -1,5 +1,4 @@
 const express = require('express');
-const BodyParser = require('body-parser');
 const cors = require('cors');
 const morgan = require('morgan');
 const apiRoutes = require('./routes/api'); 
@@ -13,4 +12,13 @@ app.use(morgan('dev'))
 
 app.use('/api', apiRoutes)
 
-app.use((err))
+app.use((err,req,res,next)=> {
+    console.error(err.stack);
+    res.status.json({error : 'Something went wrong'});
+});
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, ()=> {
+    console.log(`Server is running on port ${PORT}`);
+});
