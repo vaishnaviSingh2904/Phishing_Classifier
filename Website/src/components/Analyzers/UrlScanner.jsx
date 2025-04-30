@@ -1,51 +1,93 @@
-import React from 'react'
+import React, { useState } from 'react';
+import axios from 'axios';
 
-function UrlScanner() {
+const UrlScanner = () => {
+  const [url, setUrl] = useState('');
+  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-    return (
-      <>
-        <div className="flex justify-center mb-8">
-          <input type="text" placeholder="Paste the URL" className="border border-gray-300 rounded-l-full px-4 py-2 w-1/2" />
-          <button className="bg-blue-600 text-white px-6 py-2 rounded-r-full">Scan</button>
-        </div>
-        <div className="bg-blue-100 py-8">
-          <div className="flex justify-around">
-            <div className="text-center">
-              <i className="fas fa-circle text-4xl text-blue-600"></i>
-              <p className="text-2xl font-bold mt-2">2,053,219</p>
-              <p className="text-gray-600">Scans in the Last 24 Hours</p>
-            </div>
-            <div className="text-center">
-              <i className="fas fa-user text-4xl text-blue-600"></i>
-              <p className="text-2xl font-bold mt-2">37,639</p>
-              <p className="text-gray-600">Active Users</p>
-            </div>
-            <div className="text-center">
-              <i className="fas fa-users text-4xl text-blue-600"></i>
-              <p className="text-2xl font-bold mt-2">6,252</p>
-              <p className="text-gray-600">Active Organizations</p>
-            </div>
-          </div>
-        </div>
-        <div className="flex justify-around py-12">
-          <div className="text-left">
-            <h2 className="text-2xl font-bold mb-4">Ready to get started on CheckPhish?</h2>
-            <p className="text-gray-600 mb-4">Don't let typosquatting attacks compromise your online security. Get started today and take proactive steps towards protecting your domains across web and email.</p>
-            <button className="bg-blue-600 text-white px-6 py-2 rounded-full">Sign up</button>
-          </div>
-          <div className="text-left">
-            <h2 className="text-2xl font-bold mb-4">Read Our Blog</h2>
-            <p className="text-gray-600 mb-4">Get the latest research and thought leadership about typosquatting, domain monitoring, and phishing protection.</p>
-            <a href="#" className="text-blue-600">Learn more</a>
-          </div>
-          <div className="text-left">
-            <h2 className="text-2xl font-bold mb-4">Easy Product Guides</h2>
-            <p className="text-gray-600 mb-4">Self-guided documentation gives you step-by-step support to quick integration or issue resolution.</p>
-            <a href="#" className="text-blue-600">Knowledge Base</a>
-          </div>
-        </div>
-      </>
-    );
-  }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    setResult(null);
 
-export default UrlScanner
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Authentication required');
+      }
+
+      const response = await axios.post('/api/scan-url', 
+        { url },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      setResult(response.data);
+    } catch (err) {
+      setError(err.response?.data?.error || err.message || 'Failed to scan URL');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="p-8 bg-white shadow-md rounded-lg">
+      <h1 className="text-3xl font-bold text-blue-700 mb-4">URL Phishing Scanner</h1>
+      <p className="mb-6 text-gray-700">Enter a URL to check if it's a potential phishing site:</p>
+      
+      <form onSubmit={handleSubmit} className="mb-6">
+        <div className="flex flex-col md:flex-row gap-4">
+          <input
+            type="url"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            placeholder="https://example.com"
+            className="flex-1 p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+          <button
+            type="submit"
+            className={`px-6 py-3 ${loading ? 'bg-gray-500' : 'bg-blue-700 hover:bg-blue-800'} text-white font-medium rounded transition`}
+            disabled={loading}
+          >
+            {loading ? 'Scanning...' : 'Scan URL'}
+          </button>
+        </div>
+      </form>
+      
+      {error && (
+        <div className="p-4 mb-4 bg-red-100 text-red-700 border-l-4 border-red-500 rounded">
+          <p className="font-bold">Error</p>
+          <p>{error}</p>
+        </div>
+      )}
+      
+      {result && (
+        <div className={`p-6 rounded-lg shadow-md ${result.isPhishing ? 'bg-red-50' : 'bg-green-50'}`}>
+          <div className="flex items-center mb-4">
+            <div className={`p-2 rounded-full ${result.isPhishing ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'} mr-3`}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                {result.isPhishing ? 
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /> :
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                }
+              </svg>
+            </div>
+            <h3 className={`text-xl font-bold ${result.isPhishing ? 'text-red-700' : 'text-green-700'}`}>
+              {result.isPhishing ? 'Potential Phishing Detected' : 'URL Appears Safe'}
+            </h3>
+          </div>
+          <div className="ml-13">
+            <p className="mb-2"><strong>URL:</strong> {result.url}</p>
+            <p className="mb-2"><strong>Confidence Score:</strong> {(parseFloat(result.confidence) * 100).toFixed(2)}%</p>
+            {result.message && <p className="mb-2"><strong>Details:</strong> {result.message}</p>}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default UrlScanner;

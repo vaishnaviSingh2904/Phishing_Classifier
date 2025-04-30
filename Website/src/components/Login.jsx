@@ -150,7 +150,7 @@ const Login = (props) => {
     }
     
     try {
-      const response = await axios.post("/api/login", loginData);
+      const response = await axios.post("http://127.0.0.1:5000/api/login", loginData);
       localStorage.setItem("token", response.data.token);
       navigate("/dashboard");
 
@@ -174,7 +174,7 @@ const Login = (props) => {
     }
     
     try {
-      await axios.post("/api/register", signUpData);
+      await axios.post("http://127.0.0.1:5000/api/register", signUpData);
       setIsSignUp(false); // Switch to login form after successful registration
       setLoginData({ email: signUpData.email, password: "" });
       // Show success message
