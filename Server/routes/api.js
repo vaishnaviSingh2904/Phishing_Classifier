@@ -1,34 +1,27 @@
 const express = require('express');
 const router = express.Router();
-const {register,login} = require('../controllers/authController')
-
-router.get('/health', (req,res) => {
-    res.status(200).json(
-        {message : 'API is running successfully! '}
-    );
-})
-
-router.post('/scan-url', (req,res) => {
-    const {url} = req.body;
-
-    if(!url) {
-        return res.status(400).json({error : 'URL is required!'})
-    }
-    res.status(200).json({message : `Scanning URL: ${url}`})
-})
-
-router.post('/analyze-email', (req,res) => {
-    const {emailHeaders} = req.body;
-
-    if(!emailHeaders) {
-        return res.status(400).json({error : `Email headers are required!`})
-    }
-
-    res.status(200).json({message : 'Email analyzed successfully',headers: emailHeaders})
+const { register, login } = require('../controllers/authController');
+const auth = require('../Middleware/auth');
+const { scanUrl } = require('../controllers/urlController')
+const { analyzeEmail } = require('../controllers/emailController')
+const { getProfile, updateProfile, changePassword } = require('../controllers/userController')
+// Health check
+router.get('/health', (req, res) => {
+    res.status(200).json({ message: 'API is running successfully!' });
 });
 
-router.post('/register',register);
-router.post('/login',login);
+// Public routes
+router.post('/register', register);
+router.post('/login', login);
+
+// Protected routes
+router.post('/scan-url', auth, scanUrl);
+router.post('/analyze-email', auth, analyzeEmail);
+
+//User profile routes (Protected) 
+router.get('/profile', auth, getProfile);
+router.put('/profile', auth, updateProfile);
+router.put('/change-password', auth, changePassword);
 
 
 module.exports = router;

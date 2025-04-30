@@ -1,33 +1,102 @@
+import { useState, useEffect } from "react";
 import "./App.css";
 import Header from "./components/Header";
 import MainContainer from "./components/MainContainer";
 import Blog from "./components/Blog";
 import AboutUs from "./components/AboutUs";
 import Footer from "./components/Footer";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import Login from "./components/Login";
+
+// Protected Route wrapper component
+const ProtectedRoute = ({ children }) => {
+  // Check if user is authenticated
+  const token = localStorage.getItem("token");
+  
+  // If not authenticated, redirect to login
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // If authenticated, render the protected component
+  return children;
+};
 
 function App() {
   const location = useLocation();
-  // const isMainRoute = location.pathname === '/';
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  
+  // Check authentication status on mount and when token changes
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = localStorage.getItem("token");
+      setIsAuthenticated(!!token);
+    };
+    
+    checkAuth();
+    
+    // Add event listener for storage changes (in case of logout in another tab)
+    window.addEventListener("storage", checkAuth);
+    
+    return () => {
+      window.removeEventListener("storage", checkAuth);
+    };
+  }, []);
+
+  // Function to handle logout
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setIsAuthenticated(false);
+  };
 
   return (
     <>
       {/* Render Header for all routes except /login */}
-      {location.pathname !== "/login" && <Header />}
+      {location.pathname !== "/login" && (
+        <Header isAuthenticated={isAuthenticated} onLogout={handleLogout} />
+      )}
 
       <Routes>
-        {/* Login Route */}
-        <Route path="/login" element={<Login />} />
+        {/* Login Route - Public */}
+        <Route 
+          path="/login" 
+          element={
+            isAuthenticated ? 
+              <Navigate to="/" replace /> : 
+              <Login onLoginSuccess={() => setIsAuthenticated(true)} />
+          } 
+        />
 
-        {/* Main Route */}
-        <Route path="/" element={<MainContainer />} />
-
-        {/* About Us Route */}
-        <Route path="/AboutUs" element={<AboutUs />} />
-
-        {/* Blog Route */}
-        <Route path="/Blog" element={<Blog />} />
+        {/* All other routes - Protected */}
+        <Route 
+          path="/" 
+          element={
+            <ProtectedRoute>
+              <MainContainer />
+            </ProtectedRoute>
+          } 
+        />
+        
+        <Route 
+          path="/AboutUs" 
+          element={
+            <ProtectedRoute>
+              <AboutUs />
+            </ProtectedRoute>
+          } 
+        />
+        
+        <Route 
+          path="/Blog" 
+          element={
+            <ProtectedRoute>
+              <Blog />
+            </ProtectedRoute>
+          } 
+        />
+        
+        {/* Catch-all redirect */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
       {/* Render Footer for all routes except /login */}

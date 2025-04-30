@@ -5,7 +5,7 @@ function Footer() {
     <footer className="bg-gray-100 py-10">
       <div className="container mx-auto flex flex-wrap justify-between px-6">
         {/* PhishShield Section */}
-        <div className="w-full md:w-1/4 mb-6 md:mb-0">
+        <div className="w-full md:w-1/4 mb-6 pr-5 md:mb-0">
           <h3 className="text-xl font-bold mb-4 text-blue-700">PhishShield</h3>
           <p className="text-gray-600 mb-4">
             PhishShield provides free online security tools for mitigating typosquatting, domain monitoring, phishing detection, and a suite of active security protections.
@@ -24,7 +24,7 @@ function Footer() {
         </div>
 
         {/* Security Tools Section */}
-        <div className="w-full md:w-1/4 mb-6 md:mb-0">
+        <div className="w-full md:w-1/4 mb-6 md:mb-0 justify-center">
           <h3 className="text-xl font-bold mb-4 text-blue-700">Security Tools</h3>
           <ul className="text-gray-600 space-y-2">
             <li>
