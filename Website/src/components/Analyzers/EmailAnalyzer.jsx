@@ -19,7 +19,7 @@ const EmailHeaderAnalyzer = () => {
         throw new Error('Authentication required');
       }
 
-      const response = await axios.post('/api/analyze-email', 
+      const response = await axios.post('http://localhost:5000/api/analyze-email', 
         { emailHeaders },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -66,7 +66,47 @@ const EmailHeaderAnalyzer = () => {
             </div>
             <div className="ml-13">
               <p className="mb-2"><strong>Confidence Score:</strong> {(parseFloat(result.confidence) * 100).toFixed(2)}%</p>
-              {result.message && <p className="mb-2"><strong>Details:</strong> {result.message}</p>}
+              <p className="mb-2"><strong>Analysis Date:</strong> {new Date(result.predictionTime).toLocaleString()}</p>
+              {result.message && <p className="mb-4"><strong>Summary:</strong> {result.message}</p>}
+              
+              {/* Security Features Section */}
+              <div className="mb-4">
+                <h4 className="font-bold text-gray-700 mb-2">Security Features:</h4>
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <li className={`flex items-center ${result.features?.spfResult === 'pass' ? 'text-green-600' : result.features?.spfResult === 'fail' ? 'text-red-600' : 'text-yellow-600'}`}>
+                    <span className="mr-2">{result.features?.spfResult === 'pass' ? '✓' : result.features?.spfResult === 'fail' ? '✗' : '!'}</span>
+                    <span>SPF: {result.features?.spfResult}</span>
+                  </li>
+                  <li className={`flex items-center ${result.features?.dkimResult === 'pass' ? 'text-green-600' : result.features?.dkimResult === 'fail' ? 'text-red-600' : 'text-yellow-600'}`}>
+                    <span className="mr-2">{result.features?.dkimResult === 'pass' ? '✓' : result.features?.dkimResult === 'fail' ? '✗' : '!'}</span>
+                    <span>DKIM: {result.features?.dkimResult}</span>
+                  </li>
+                  {result.features?.suspiciousSender !== undefined && (
+                    <li className={`flex items-center ${!result.features.suspiciousSender ? 'text-green-600' : 'text-red-600'}`}>
+                      <span className="mr-2">{!result.features.suspiciousSender ? '✓' : '✗'}</span>
+                      <span>Sender Analysis: {!result.features.suspiciousSender ? 'Normal' : 'Suspicious'}</span>
+                    </li>
+                  )}
+                  {result.features?.replyToMismatch !== undefined && (
+                    <li className={`flex items-center ${!result.features.replyToMismatch ? 'text-green-600' : 'text-red-600'}`}>
+                      <span className="mr-2">{!result.features.replyToMismatch ? '✓' : '✗'}</span>
+                      <span>Reply-To: {!result.features.replyToMismatch ? 'Valid' : 'Mismatched'}</span>
+                    </li>
+                  )}
+                </ul>
+              </div>
+              
+              {/* Risk Factors Section */}
+              {result.riskFactors && result.riskFactors.length > 0 && (
+                <div>
+                  <h4 className="font-bold text-gray-700 mb-2">Risk Factors Identified:</h4>
+                  <ul className="list-disc list-inside text-gray-700">
+                    {result.riskFactors.map((factor, index) => (
+                      <li key={index} className="mb-1">{factor}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           </div>
         )}

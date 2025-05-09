@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { register, login } = require('../controllers/authController');
+const { register, login, googleLogin } = require('../controllers/authController');
 const auth = require('../Middleware/auth');
 const { scanUrl } = require('../controllers/urlController')
 const { analyzeEmail } = require('../controllers/emailController')
@@ -13,6 +13,7 @@ router.get('/health', (req, res) => {
 // Public routes
 router.post('/register', register);
 router.post('/login', login);
+router.post('/google-login', googleLogin);
 
 // Protected routes
 router.post('/scan-url', auth, scanUrl);

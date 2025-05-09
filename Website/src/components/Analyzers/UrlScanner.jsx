@@ -19,7 +19,7 @@ const UrlScanner = () => {
         throw new Error('Authentication required');
       }
 
-      const response = await axios.post('/api/scan-url', 
+      const response = await axios.post('http://localhost:5000/api/scan-url', 
         { url },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -79,10 +79,70 @@ const UrlScanner = () => {
               {result.isPhishing ? 'Potential Phishing Detected' : 'URL Appears Safe'}
             </h3>
           </div>
-          <div className="ml-13">
+          
+          <div className="ml-13 mb-6">
             <p className="mb-2"><strong>URL:</strong> {result.url}</p>
             <p className="mb-2"><strong>Confidence Score:</strong> {(parseFloat(result.confidence) * 100).toFixed(2)}%</p>
+            <p className="mb-2"><strong>Scan Date:</strong> {new Date(result.predictionTime).toLocaleString()}</p>
             {result.message && <p className="mb-2"><strong>Details:</strong> {result.message}</p>}
+          </div>
+          
+          {/* URL Feature Analysis */}
+          <div className="bg-white bg-opacity-50 p-4 rounded-lg border border-gray-200 mb-4">
+            <h4 className="font-semibold text-gray-800 mb-3">URL Feature Analysis</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {result.features?.domainAge !== undefined && (
+                <div className="flex items-center">
+                  <span className={`inline-block w-3 h-3 rounded-full mr-2 ${result.features.domainAge > 365 ? 'bg-green-500' : 'bg-yellow-500'}`}></span>
+                  <span>Domain Age: {result.features.domainAge} days</span>
+                </div>
+              )}
+              
+              {result.features?.hasHttps !== undefined && (
+                <div className="flex items-center">
+                  <span className={`inline-block w-3 h-3 rounded-full mr-2 ${result.features.hasHttps ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                  <span>HTTPS: {result.features.hasHttps ? 'Yes' : 'No'}</span>
+                </div>
+              )}
+              
+              {result.features?.urlLength !== undefined && (
+                <div className="flex items-center">
+                  <span className={`inline-block w-3 h-3 rounded-full mr-2 ${result.features.urlLength < 75 ? 'bg-green-500' : result.features.urlLength < 100 ? 'bg-yellow-500' : 'bg-red-500'}`}></span>
+                  <span>URL Length: {result.features.urlLength} characters</span>
+                </div>
+              )}
+              
+              {result.features?.numberOfSubdomains !== undefined && (
+                <div className="flex items-center">
+                  <span className={`inline-block w-3 h-3 rounded-full mr-2 ${result.features.numberOfSubdomains <= 1 ? 'bg-green-500' : result.features.numberOfSubdomains == 2 ? 'bg-yellow-500' : 'bg-red-500'}`}></span>
+                  <span>Subdomains: {result.features.numberOfSubdomains}</span>
+                </div>
+              )}
+              
+              {result.features?.hasSpecialChars !== undefined && (
+                <div className="flex items-center">
+                  <span className={`inline-block w-3 h-3 rounded-full mr-2 ${!result.features.hasSpecialChars ? 'bg-green-500' : 'bg-yellow-500'}`}></span>
+                  <span>Special Characters: {result.features.hasSpecialChars ? 'Present' : 'None'}</span>
+                </div>
+              )}
+            </div>
+          </div>
+          
+          {/* Action Recommendations */}
+          <div className={`p-4 rounded-lg ${result.isPhishing ? 'bg-red-100' : 'bg-green-100'}`}>
+            <h4 className="font-semibold mb-2">Recommendation</h4>
+            {result.isPhishing ? (
+              <div>
+                <p className="mb-2">This URL shows signs of being a phishing attempt. We recommend:</p>
+                <ul className="list-disc list-inside ml-2">
+                  <li>Do not enter any personal information on this site</li>
+                  <li>Do not download any files from this URL</li>
+                  <li>Report this URL to your organization's security team</li>
+                </ul>
+              </div>
+            ) : (
+              <p>This URL appears to be legitimate based on our analysis. However, always remain cautious when sharing sensitive information online.</p>
+            )}
           </div>
         </div>
       )}

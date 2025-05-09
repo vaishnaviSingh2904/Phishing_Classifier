@@ -42,15 +42,7 @@ function Header({ isAuthenticated, onLogout }) {
           >
             About Us
           </Link>
-          <Link
-            to="/login"
-            className={`${location.pathname === "/login"
-                ? "text-blue-600 border-b-2 border-blue-600"
-                : "text-gray-700"
-              } hover:text-blue-600 transition duration-200`}
-          >
-            Login
-          </Link>
+          
           {isAuthenticated ? (
             <button
               onClick={onLogout}
